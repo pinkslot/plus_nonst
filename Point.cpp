@@ -33,7 +33,7 @@ arrayd rorate2array_matrix(arrayd x) {
 }
 
 double exp_rand(double l, double maxv) {
-	return log(1 - (1 - exp(-l * (maxv - EPS*2))) * randf()) / -l;
+	return log((exp(-l * maxv) - 1) * randf() + 1) / -l;
 }
 
 double Point::f(int n, int m) {
