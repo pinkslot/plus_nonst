@@ -2,7 +2,7 @@
 #include "atlimage.h"
 
 double randf() {
-	return (double)rand() / RAND_MAX;
+	return ((double)rand() + 1) / (RAND_MAX + 2.);
 }
 
 arrayd make_array3d(double x, double y, double z) {
@@ -42,7 +42,7 @@ void print3d(arrayd x) {
 }
 arrayd w = make_array3d(0, 0, 1);
 double up2w(sp<BorderPoint> x) {
-	return x->t > EPS? 
+	return x->t > EPS ? 
 		.3 + exp(-.5 * norm(x->dir - w) * norm(x->dir - w)) :
 		0;
 }
