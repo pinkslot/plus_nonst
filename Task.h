@@ -5,7 +5,7 @@ class Task
 {
 protected:
 	Media * G;
-	int n, m;
+	int n, m, k;
 	double size, time_step, min_time, max_time, z_screen,
 		size2, step;
 	string task_name;

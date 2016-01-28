@@ -27,10 +27,15 @@ void Task::go() {
 		for (auto y = 0; y < res; i += step, y++) {
 			double j = -size2;
 			for (auto x = 0; x < res; j += step, x++) {
+				Point * p = new Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G);
+				double f = 0;
+				for (int i = 0; i < k; i++) {
+					f += p->f(n, m);
+				}
 				double f = Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G).f(n, m);
 				//cout << "t" << t << "y" << y << "x" << x << endl << "------------";
 			//	os << f;
-				int val = no_more255(color_mul * f);
+				int val = no_more255(color_mul * f / k);
 				img.SetPixel(x, y, RGB(val, val, val));
 			}
 		}
@@ -49,12 +54,12 @@ void Task1::init() {
 	G->add_submedia(new SphereMedia(1., .1, .001, 16., 1., make_array3d(-1.5, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
 	G->add_submedia(new SphereMedia(1., .1, .001, 16., .3, make_array3d(-1.5, 2, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
 
-	res = 200, color_mul = 150;
+	res = 200, color_mul = 100;
 
-	n = 10, m = 1;
+	n = 5, m = 1, k = 5;
 	size = 6., time_step = .3, min_time = 3, max_time = 15, z_screen = 3,
 		size2 = size / 2, step = size / res;
-	task_name = string("first");
+	task_name = string("fst");
 }
 
 void Task2::init() {
@@ -65,8 +70,8 @@ void Task2::init() {
 
 	res = 200, color_mul = 150;
 
-	n = 10, m = 1;
-	size = 6., time_step = .5, min_time = 3, max_time = 40, z_screen = 3,
+	n = 5, m = 1, k = 5;
+	size = 5., time_step = .5, min_time = 10, max_time = 30, z_screen = 3,
 		size2 = size / 2, step = size / res;
 	task_name = string("sec");
 }
