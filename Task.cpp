@@ -2,6 +2,7 @@
 #include "Utils.h"
 #include <atlimage.h>
 #include <fstream>
+#include <ctime>
 
 Task::Task()
 {
@@ -13,6 +14,7 @@ void Task::go() {
 	//double qw = Point(15.5, make_array3d(-1.5, .5, 2), make_array3d(0, 0, 1), G).f(n, m);
 	system((string("rm -r ") + task_name).c_str());
 	system((string("mkdir ") + task_name).c_str());
+	clock_t start = clock();
 
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
 		char img_fname[20], log_fname[20];
@@ -34,7 +36,7 @@ void Task::go() {
 		}
 		img.Save(img_fname);
 		img.Destroy();
-		cout << "DONE " << t << endl;
+		cout << "DONE " << t << "\tin " << (clock() - start ) / (double)CLOCKS_PER_SEC << endl;
  	}
 }
 
