@@ -1,7 +1,7 @@
 #include "Media.h"
 
-Media::Media(double v, double mu, double mu_s, double k, double(*border)(sp<BorderPoint> x), double(*indic)()) :
-v(v), mu(mu), mu_s(mu_s), k(k), border(border), indic(indic), overmedia(0)
+Media::Media(double v, double mu, double mu_s, double k, double(*indic)()):
+	v(v), mu(mu), mu_s(mu_s), k(k), indic(indic), overmedia(0)
 {
 }
 
@@ -17,9 +17,8 @@ void Media::add_submedia(Media * s) {
 	s->overmedia = this;
 }
 
-SphereMedia::SphereMedia(double v, double mu, double mu_s, double k, double r, arrayd c, 
-	double(*border)(sp<BorderPoint> x), double(*indic)()) :
-	Media(v, mu, mu_s, k, border, indic), r(r), c(c)
+SphereMedia::SphereMedia(double v, double mu, double mu_s, double k, double r, arrayd c, double(*indic)()) :
+	Media(v, mu, mu_s, k, indic), r(r), c(c)
 {
 }
 

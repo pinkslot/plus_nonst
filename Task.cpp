@@ -47,12 +47,11 @@ void Task::go() {
 
 void Task1::init() {
 	// ADD BEGINING COND
-	Media *G1 = new GlobalMedia(up2w);
-	G = new SphereMedia(1., .01, .001, 4., 10., make_array3d(0, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; });
-	G1->add_submedia(G);
-	G->add_submedia(new SphereMedia(1., .1, .1, 1., 1., make_array3d(1.5, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
-	G->add_submedia(new SphereMedia(1., .1, .001, 16., 1., make_array3d(-1.5, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
-	G->add_submedia(new SphereMedia(1., .1, .001, 16., .3, make_array3d(-1.5, 2, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
+	G = new SphereMedia(1., .001, .001, 4., 10., make_array3d(0, 0, 0), []() { return 1.; });
+	GlobalMedia::instance(up2w)->add_submedia(G);
+	G->add_submedia(new SphereMedia(1., .1, .1, 1., 1., make_array3d(1.5, 0, 0), []() { return 1.; }));
+	G->add_submedia(new SphereMedia(1., .1, .001, 16., 1., make_array3d(-1.5, 0, 0), []() { return 1.; }));
+	G->add_submedia(new SphereMedia(1., .1, .001, 16., .3, make_array3d(-1.5, 2, 0), []() { return 1.; }));
 
 	res = 200, color_mul = 100;
 
@@ -63,10 +62,9 @@ void Task1::init() {
 }
 
 void Task2::init() {
-	Media *G1 = new GlobalMedia([](sp<BorderPoint> x) { return x->t > EPS ? 1. : 0.; });
-	G = new SphereMedia(1., .001, .001, 4., 10., make_array3d(0, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; });
-	G1->add_submedia(G);
-	G->add_submedia(new SphereMedia(1., .1, .1, 1., 1., make_array3d(0, 0, 0), [](sp<BorderPoint> x) { return 0.; }, []() { return 1.; }));
+	G = new SphereMedia(1., .001, .001, 1., 10., make_array3d(0, 0, 0), []() { return randf() / 2 + .5; });
+	GlobalMedia::instance(up2w)->add_submedia(G);
+	G->add_submedia(new SphereMedia(1., .5, .5, 5., 1., make_array3d(0, 0, -2), []() { return randf() / 2 + .5; }));
 
 	res = 200, color_mul = 150;
 
