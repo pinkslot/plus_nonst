@@ -43,6 +43,14 @@ void Task::go() {
  	}
 }
 
+void Task::point_go() {
+	clock_t start = clock();
+	for (double i = 1; i < 10; i++) {
+		cout << i << ' ' << Point(10, make_array3d(1 - .1*i, 0, 4), make_array3d(0, 0, 1), G).f(n, m) << endl;
+	}
+	cout << "DONE " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
+}
+
 void Task1::init() {
 	// ADD BEGINING COND
 	G = new SphereMedia(1., .001, .001, 4., 10., make_array3d(0, 0, 0), []() { return 1.; });
@@ -72,6 +80,16 @@ void Task2::init() {
 	task_name = string("sec");
 }
 
+void Task3::init() {
+	G = new SphereMedia(1., .01, .01, 1., 10., make_array3d(2, 0, 0), []() { return 1.; });
+	GlobalMedia::instance( [](sp<BorderPoint> x) { return 1.; })->add_submedia(G);
+	G->add_submedia(new SphereMedia(1., .5, .5, 4., 1., make_array3d(0, 0, 0), []() { return 1.; }));
+	res = 200, color_mul = 150;
+	n = 15, m = 1, k = 1;
+	size = 5., time_step = .5, min_time = 10, max_time = 30, z_screen = 3,
+		size2 = size / 2, step = size / res;
+	task_name = string("trd");
+}
 
 
 

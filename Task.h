@@ -13,6 +13,7 @@ protected:
 	int res, color_mul;
 public:
 	void go();
+	void point_go();
 	Task();
 };
 
@@ -28,8 +29,8 @@ public:
 	Task2() {}
 	void init();
 };
-/*
-class Task3 : Task {
+
+class Task3 : public Task {
 public:
 	Task3() {}
 	void init();

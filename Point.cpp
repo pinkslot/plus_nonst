@@ -60,7 +60,7 @@ double Point::f(int n, int m) {
 		return optical_dist * nearest->border(border_point);
 	}
 	double sumI = 0;
-	if (m) {
+	if (m && min_dist > EPS) {
 		arrayd Q = rorate2array_matrix(dir);
 		for (int i = 0; i < m; i++) {
 			double rand_dist = exp_rand(media->mu, min_dist - EPS);
@@ -95,10 +95,11 @@ double BorderPoint::f(int n, int m) {
 	arrayd dirR = dir - 2 * cosAfter * normal;
 	//loger << "R " <<   n <<endl;
 	double partR = Point(t, pos, dirR, media_to).f(n, m);
-	if (1 - k * k * (1 - cosAfter) < 0) {
+	double cosT = 1 - k * k * (1 - cosAfter * cosAfter);
+	if (cosT < 0) {
 		return partR;
 	}
-	double cosT = sqrt(1 - k * k * (1 - cosAfter));
+	cosT = sqrt(cosT);
 	arrayd dirT = cosT * normal + k * (dir - cosAfter * normal);
 	
 	double a = (k * cosT + cosAfter),
@@ -109,6 +110,7 @@ double BorderPoint::f(int n, int m) {
 		Tpar = c / a,
 		Tper = c / b,
 		R = 1. / 2. * (Rpar * Rpar + Rper * Rper),
+		T = 1. / 2. * (Tpar * Tpar + Tper * Tper) * k * cosAfter / cosT;
 		double q = dot(dirT, normal), w = dot(dirR, normal);
 	// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
 	return R * partR + T * Point(t, pos, dirT, media).f(n, m);
