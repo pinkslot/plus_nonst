@@ -100,7 +100,7 @@ double BorderPoint::f(int n, int m) {
 	else {
 		normal = -media_to->normal(pos);
 	}
-	double k = media_to->k / media->k;
+	double k = media->k / media_to->k;
 	double cosAfter = dot(dir, normal);
 
 	arrayd dirR = dir - 2 * cosAfter * normal;
