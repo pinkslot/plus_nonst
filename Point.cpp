@@ -48,13 +48,6 @@ double Point::f(int n, int m) {
 			nearest = i;
 		}
 	}
-	//loger << min_dist<<"###"<< endl;
-	if (loger.str().size() > 100000) loger.str("");
-	if (min_dist < 0) {
-		//loger << "QQQQ" << endl;
-		media->dist2border(this);
-	}
-	assert(min_dist > 0 || ((cout << pos[0] << ' ' << pos[1] << ' ' << pos[2] << ' ' << endl) && false));
 	double border_t = t - min_dist / media->v;
 	if (border_t < 0) {
 		border_t = 0;
@@ -73,15 +66,11 @@ double Point::f(int n, int m) {
 			double rand_dist = exp_rand(media->mu, min_dist - EPS);
 			arrayd new_pos = pos - dir * rand_dist;
 			arrayd new_dir = Matmul(Q, media->rand_dir());
-			/*print3d(pos);
-			print3d(new_pos);
-			print3d(new_dir);
-			cout <<t << ' ' << t - rand_dist / media->v << ' '<< min_dist << ' ' << rand_dist << "+++++" << endl;*/
+			// loger << "S " << n <<  ' ' << optical_dist <<endl;
 			sumI += Point(t - rand_dist / media->v, new_pos, new_dir, media).f(n - 1, m);
 		}
 		sumI = sumI / m * (1 - optical_dist) * media->mu_s / media->mu;
 	}
-	//cout << media->border(border_point) << "----" << optical_dist << "----" << min_dist << endl;
 	return (nearest->border(border_point) + border_point->f(n - 1, m)) * optical_dist + sumI;
 }
 
@@ -104,7 +93,7 @@ double BorderPoint::f(int n, int m) {
 	double cosAfter = dot(dir, normal);
 
 	arrayd dirR = dir - 2 * cosAfter * normal;
-	//cout << "R" << endl;
+	//loger << "R " <<   n <<endl;
 	double partR = Point(t, pos, dirR, media_to).f(n, m);
 	if (1 - k * k * (1 - cosAfter) < 0) {
 		return partR;
@@ -120,11 +109,8 @@ double BorderPoint::f(int n, int m) {
 		Tpar = c / a,
 		Tper = c / b,
 		R = 1. / 2. * (Rpar * Rpar + Rper * Rper),
-		T = 1. / 2. * (Tpar * Tpar + Tper * Tper) * k / cosT;
-	if (dot(dirT, normal) < 0.0001 || dot(dirR, normal) > 0) {
-		double a = dot(dirT, normal), b = dot(dirR, normal);
-	}
-	//cout << "T: " <<  T << ' ' << R << endl;
+		double q = dot(dirT, normal), w = dot(dirR, normal);
+	// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
 	return R * partR + T * Point(t, pos, dirT, media).f(n, m);
 }
 

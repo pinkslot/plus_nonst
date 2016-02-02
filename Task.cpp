@@ -20,7 +20,6 @@ void Task::go() {
 		char img_fname[20], log_fname[20];
 		//loger << "QQQQQQQQQQQ" << tt<<endl;
 		sprintf_s(img_fname, "%s/%02i.bmp", task_name.c_str(), tt);
-		//ofstream os(log_fname);
 		sprintf_s(log_fname, "%s/%02i.log", task_name.c_str(), tt);
 		img.Create(res, res, 24);
 		double i = -size2;
@@ -32,9 +31,8 @@ void Task::go() {
 				for (int i = 0; i < k; i++) {
 					f += p->f(n, m);
 				}
-				double f = Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G).f(n, m);
-				//cout << "t" << t << "y" << y << "x" << x << endl << "------------";
-			//	os << f;
+				//loger.str("");
+				//loger << "t" << t << "y" << y << "x" << x << endl << "------------";
 				int val = no_more255(color_mul * f / k);
 				img.SetPixel(x, y, RGB(val, val, val));
 			}
