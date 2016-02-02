@@ -20,9 +20,9 @@ double indic_direct();
 struct BorderPoint;
 double begining(sp<BorderPoint> x);
 double up2w(sp<BorderPoint> x);
+double around_c(sp<BorderPoint> x);
 void print3d(arrayd x);
 extern stringstream loger;
-
 int no_more255(int value);
 
 #include "Point.h"

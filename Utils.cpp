@@ -40,11 +40,21 @@ int no_more(int value)
 void print3d(arrayd x) {
 	cout << x[0] << ' ' << x[1] << ' ' << x[2] << endl;
 }
-arrayd w = make_array3d(0, 0, 1);
+
+arrayd w1 = make_array3d(-1, 0, -1.), w = w1 / norm(w1);
 double up2w(sp<BorderPoint> x) {
 	return x->t > EPS ? 
 		.3 + exp(-.5 * norm(x->dir - w) * norm(x->dir - w)) :
 		0;
+}
+
+double monus(double x, double y) {
+	return x > y ? x - y : 0;
+}
+arrayd c = make_array3d(-10, 0, 0);
+double around_c(sp<BorderPoint> x) {
+	double dif = norm(x->pos - c);
+	return x->t > EPS ? monus(10., dif) / 5. : 0;
 }
 
 int no_more255(int value) {
