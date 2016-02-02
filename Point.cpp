@@ -38,10 +38,11 @@ double exp_rand(double l, double maxv) {
 
 double Point::f(int n, int m) {
 	//loger << "f";
-	double min_dist = media->dist2border(this);
+	double min_dist = media->int_dist(this);
+	min_dist = min_dist < 0 ? 0 : min_dist;
 	Media *nearest = media->overmedia;
 	for (auto &i : media->submedia) {
-		double cur = i->dist2border(this);
+		double cur = i->ext_dist(this);
 		if (cur > 0 && cur < min_dist) {
 			min_dist = cur;
 			nearest = i;
