@@ -57,7 +57,7 @@ double Point::f(int n, int m) {
 	double optical_dist = exp(-media->mu * min_dist);
 	sp<BorderPoint> border_point(new BorderPoint(border_t, border_pos, dir, nearest, media));
 	if (!n) {
-		return optical_dist * media->border(border_point);
+		return optical_dist * nearest->border(border_point);
 	}
 	double sumI = 0;
 	if (m) {
