@@ -14,6 +14,7 @@ protected:
 public:
 	void go();
 	void point_go();
+	void calc_stat();
 	Task();
 };
 

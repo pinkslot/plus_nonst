@@ -51,6 +51,27 @@ void Task::point_go() {
 	cout << "DONE " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
 }
 
+void Task::calc_stat() {
+	cout << "start on " << task_name << endl;
+
+	int TIME = 10;
+	for (double n = 2; n < 100; n++) {
+		Point * p = new Point(TIME, make_array3d(0., 0., 5), make_array3d(0, 0, 1), G);
+		clock_t start = clock();
+		double f = 0, df = 0;
+		for (int i = 0; i < k; i++) {
+			double ff = p->f(n);
+			f += ff;
+			df += ff * ff;
+			if (i % 1000 == 0) cout << '\xd' << i / 1000 << '/' << k / 1000;
+		}
+		double avg_time = (clock() - start) / (double)CLOCKS_PER_SEC / k;
+		f /= k;
+		df = sqrt((df - f * f * k) / (k - 1)) / f;
+
+		cout << '\xd' <<  "f = " << f << " \teps=" << f / exp(TIME) - 1  << "\tdelf(" << n << ")= " << df << "\tcomplexity = " << df * avg_time<< endl;
+	}
+}
 void Task1::init() {
 	// ADD BEGINING COND
 	G = new SphereMedia(1., .001, .001, 4., 10., make_array3d(0, 0, 0), []() { return 1.; });
