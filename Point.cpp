@@ -36,7 +36,7 @@ double exp_rand(double l, double maxv) {
 	return log((exp(-l * maxv) - 1) * randf() + 1) / -l;
 }
 
-double Point::f(int n, int m) {
+double Point::f(int n) {
 	//loger << "f";
 	double min_dist = media->int_dist(this);
 	min_dist = min_dist < 0 ? 0 : min_dist;
@@ -59,26 +59,27 @@ double Point::f(int n, int m) {
 	if (!n) {
 		return optical_dist * nearest->border(border_point);
 	}
-	double sumI = 0;
+	double scat = 0;
+	int m = GlobalMedia::instance()->m;
 	if (m && min_dist > EPS) {
 		arrayd Q = rorate2array_matrix(dir);
 		for (int i = 0; i < m; i++) {
+			arrayd new_dir = Matmul(Q, media->rand_dir());
 			double rand_dist = exp_rand(media->mu, min_dist - EPS);
 			arrayd new_pos = pos - dir * rand_dist;
-			arrayd new_dir = Matmul(Q, media->rand_dir());
-			// loger << "S " << n <<  ' ' << optical_dist <<endl;
-			sumI += Point(t - rand_dist / media->v, new_pos, new_dir, media).f(n - 1, m);
+			sp<Point> p(new Point(t - rand_dist / media->v, new_pos, new_dir, media));
+			scat += p->f(n - 1) * media->mu_s + media->intern(p);
 		}
-		sumI = sumI / m * (1 - optical_dist) * media->mu_s / media->mu;
+		scat *= (1 - optical_dist) / media->mu / m;
 	}
-	return (nearest->border(border_point) + border_point->f(n - 1, m)) * optical_dist + sumI;
+	return (nearest->border(border_point) + border_point->f(n - 1)) * optical_dist + scat;
 }
 
 BorderPoint::BorderPoint(double t, arrayd pos, arrayd dir, Media *media_from, Media *media_to):
 	Point(t, pos, dir, media_from), media_to(media_to) {
 }
 
-double BorderPoint::f(int n, int m) {
+double BorderPoint::f(int n) {
 	if (t < EPS || media->is_global()) {
 		return 0;
 	}
@@ -94,7 +95,7 @@ double BorderPoint::f(int n, int m) {
 
 	arrayd dirR = dir - 2 * cosAfter * normal;
 	//loger << "R " <<   n <<endl;
-	double partR = Point(t, pos, dirR, media_to).f(n, m);
+	double partR = Point(t, pos, dirR, media_to).f(n);
 	double cosT = 1 - k * k * (1 - cosAfter * cosAfter);
 	if (cosT < 0) {
 		return partR;
@@ -113,7 +114,7 @@ double BorderPoint::f(int n, int m) {
 		T = 1. / 2. * (Tpar * Tpar + Tper * Tper) * k * cosAfter / cosT;
 		double q = dot(dirT, normal), w = dot(dirR, normal);
 	// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
-	return R * partR + T * Point(t, pos, dirT, media).f(n, m);
+	return R * partR + T * Point(t, pos, dirT, media).f(n);
 }
 
 Point::~Point()

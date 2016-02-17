@@ -8,14 +8,14 @@ struct Point {
 	double t;
 	Media *media;
 	Point(double t, arrayd pos, arrayd dir, Media * media);
-	double f(int n, int m);
+	double f(int n);
 	~Point();
 };
 
 struct BorderPoint: Point {
 	Media *media_to;
 	BorderPoint(double t, arrayd pos, arrayd dir, Media *media_from, Media *media_to);
-	double f(int n, int m);
+	double f(int n);
 };
 
 #include "Media.h"

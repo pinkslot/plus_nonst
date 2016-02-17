@@ -61,4 +61,9 @@ int no_more255(int value) {
 	return value > 255 ? 255 : value;
 }
 
-stringstream loger;
+double take_point_ret_zero(sp<Point>)
+{
+	return 0.0;
+}
+
+stringstream loger;

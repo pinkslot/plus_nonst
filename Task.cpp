@@ -29,7 +29,7 @@ void Task::go() {
 				Point * p = new Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G);
 				double f = 0;
 				for (int i = 0; i < k; i++) {
-					f += p->f(n, m);
+					f += p->f(n);
 				}
 				//loger.str("");
 				//loger << "t" << t << "y" << y << "x" << x << endl << "------------";
@@ -93,4 +93,4 @@ void Task3::init() {
 
 
 
-
+

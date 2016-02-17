@@ -25,4 +25,6 @@ void print3d(arrayd x);
 extern stringstream loger;
 int no_more255(int value);
 
+double take_point_ret_zero(sp<Point>);
+
 #include "Point.h"
