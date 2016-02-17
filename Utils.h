@@ -9,6 +9,9 @@ using namespace std;
 #define EPS 1E-10
 
 #define sp shared_ptr
+
+struct BorderPoint;
+struct Point;
 typedef valarray<double> arrayd;
 
 double randf();
@@ -17,7 +20,6 @@ double dot(arrayd x, arrayd y);
 double norm(arrayd x);
 double indic_isotrophy();
 double indic_direct();
-struct BorderPoint;
 double begining(sp<BorderPoint> x);
 double up2w(sp<BorderPoint> x);
 double around_c(sp<BorderPoint> x);
@@ -27,4 +29,6 @@ int no_more255(int value);
 
 double take_point_ret_zero(sp<Point>);
 
+
+extern int counter;
 #include "Point.h"

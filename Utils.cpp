@@ -51,10 +51,11 @@ double up2w(sp<BorderPoint> x) {
 double monus(double x, double y) {
 	return x > y ? x - y : 0;
 }
-arrayd c = make_array3d(-10, 0, 0);
+arrayd c = make_array3d(0, 0, -10);
+double r = 10;
 double around_c(sp<BorderPoint> x) {
 	double dif = norm(x->pos - c);
-	return x->t > EPS ? monus(10., dif) / 5. : 0;
+	return x->t > -1 ? monus(r, dif) / r * 5. : 0;
 }
 
 int no_more255(int value) {
@@ -66,4 +67,5 @@ double take_point_ret_zero(sp<Point>)
 	return 0.0;
 }
 
-stringstream loger;
+stringstream loger;
+int counter = 0;

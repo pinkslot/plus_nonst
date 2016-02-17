@@ -11,13 +11,12 @@ Task::Task()
 void Task::go() {
 	CImage img;
 	int tt = 0;
-	//double qw = Point(15.5, make_array3d(-1.5, .5, 2), make_array3d(0, 0, 1), G).f(n, m);
 	system((string("rm -r ") + task_name).c_str());
 	if (system((string("mkdir ") + task_name).c_str())) {
 		return;
 	}
 	clock_t start = clock();
-
+	cout << "start on " << task_name << endl;
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
 		char img_fname[20], log_fname[20];
 		//loger << "QQQQQQQQQQQ" << tt<<endl;
@@ -25,7 +24,7 @@ void Task::go() {
 		sprintf_s(log_fname, "%s/%02i.log", task_name.c_str(), tt);
 		img.Create(res, res, 24);
 		double i = -size2;
-		for (auto y = 0; y < res; i += step, y++) {
+		for (auto y = res - 1; y >= 0; i += step, y--) {
 			double j = -size2;
 			for (auto x = 0; x < res; j += step, x++) {
 				Point * p = new Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G);
@@ -41,14 +40,24 @@ void Task::go() {
 		}
 		img.Save(img_fname);
 		img.Destroy();
-		cout << "DONE " << t << "\tin " << (clock() - start ) / (double)CLOCKS_PER_SEC << endl;
+		cout << "DONE " << t << " \tin " << (clock() - start ) / (double)CLOCKS_PER_SEC << endl;
  	}
 }
 
 void Task::point_go() {
+	cout << "start on " << task_name << endl;
 	clock_t start = clock();
-	for (double i = 1; i < 10; i++) {
-		cout << i << ' ' << Point(10, make_array3d(1 - .1*i, 0, 4), make_array3d(0, 0, 1), G).f(n, m) << endl;
+	for (double t = min_time; t < max_time; t += time_step) {
+		Point * p = new Point(t, make_array3d(0., 0., 0), make_array3d(0, 0, 1), G);
+		double f = 0, df = 0;
+		for (int i = 0; i < k; i++) {
+			double ff = p->f(n);
+			f += ff;
+			df += ff * ff;
+		}
+		cout << t << ' ' << f
+			<< " with " << counter / k << " steps" << endl;
+		counter = 0;
 	}
 	cout << "DONE " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
 }
