@@ -13,7 +13,9 @@ void Task::go() {
 	int tt = 0;
 	//double qw = Point(15.5, make_array3d(-1.5, .5, 2), make_array3d(0, 0, 1), G).f(n, m);
 	system((string("rm -r ") + task_name).c_str());
-	system((string("mkdir ") + task_name).c_str());
+	if (system((string("mkdir ") + task_name).c_str())) {
+		return;
+	}
 	clock_t start = clock();
 
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
