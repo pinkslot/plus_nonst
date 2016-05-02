@@ -8,13 +8,15 @@ Task::Task()
 {
 }
 
+bool Task::make_folder() {
+	system((string("rm -r ") + task_name).c_str());
+	return !system((string("mkdir ") + task_name).c_str());
+}
+
 void Task::go() {
+	if (!make_folder()) return;
 	CImage img;
 	int tt = 0;
-	system((string("rm -r ") + task_name).c_str());
-	if (system((string("mkdir ") + task_name).c_str())) {
-		return;
-	}
 	clock_t start = clock();
 	cout << "start on " << task_name << endl;
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
