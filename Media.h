@@ -4,7 +4,9 @@
 #include <iostream>
 using namespace std;
 
+class AddSubmediaError {};
 struct GlobalMedia;
+struct SphereMedia;
 struct Media
 {
 	double v, mu, mu_s, k, (*indic)();
@@ -19,6 +21,8 @@ struct Media
 	virtual bool is_global() = 0;
 	virtual double border(sp<BorderPoint> x) = 0;
 	double (*intern)(sp<Point> x);
+	virtual bool intersect(Media *another) = 0;
+	virtual bool intersect(SphereMedia *another) { return 0;  }
 };
 
 struct GlobalMedia : Media {
@@ -34,6 +38,7 @@ struct GlobalMedia : Media {
 		return &inst;
 	}
 	bool is_global() { return true; }
+	virtual bool intersect(Media *another) { return false; }
 private:
 	GlobalMedia(): Media(0., 0., 0., indic_direct) {}
 };
@@ -47,4 +52,6 @@ struct SphereMedia: Media {
 	SphereMedia(double mu, double mu_s, double k, double r, arrayd c, double(*indic)(), double(*intern)(sp<Point> x) = take_point_ret_zero);
 	bool is_global() { return false; }
 	virtual double border(sp<BorderPoint> x) { return x->t > EPS ? 0 : GlobalMedia::instance()->border(x); }
+	virtual bool intersect(Media *another) { return another->intersect(this); }
+	bool intersect(SphereMedia *another) { return norm(another->c - c) < r + another->r; }
 };

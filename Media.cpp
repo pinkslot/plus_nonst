@@ -14,6 +14,11 @@ arrayd Media::rand_dir() {
 }
 
 void Media::add_submedia(Media * s) {
+	for (auto &i : submedia) {
+		if (i->intersect(s)) {
+//			throw AddSubmediaError();
+		}
+	}
 	submedia.push_back(s);
 	s->overmedia = this;
 }
