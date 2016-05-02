@@ -3,9 +3,12 @@
 #include <assert.h>
 #include <fstream>
 
+
+
 Point::Point(double t, arrayd pos, arrayd dir, Media * media):
 t(t), pos(pos), dir(dir/norm(dir)), media(media)
 {
+//	assert(media->in(this));
 }
 
 arrayd Matmul(arrayd mat, arrayd vec) {
@@ -50,6 +53,7 @@ double Point::f(int n) {
 	}
 	double border_t = t - min_dist / media->v;
 	if (border_t < 0) {
+		nearest = media;
 		border_t = 0;
 		min_dist = media->v * t;
 	}
@@ -114,7 +118,7 @@ double BorderPoint::f(int n) {
 		T = 1. / 2. * (Tpar * Tpar + Tper * Tper) * k * cosAfter / cosT;
 		double q = dot(dirT, normal), w = dot(dirR, normal);
 	// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
-	return R * partR + T * Point(t, pos, dirT, media).f(n);
+		return R * partR + T * Point(t, pos, dirT, media).f(n);
 }
 
 Point::~Point()

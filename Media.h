@@ -5,12 +5,14 @@
 using namespace std;
 
 class AddSubmediaError {};
+
 struct GlobalMedia;
 struct SphereMedia;
+class Point;
 struct Media
 {
+	virtual bool in(Point *x) { return true; }
 	double v, mu, mu_s, k, (*indic)();
-	arrayd rand_dir();
 	vector<Media *> submedia;
 	Media *overmedia;
 	Media(double mu, double mu_s, double k, double(*indic)(), double(*intern)(sp<Point> x) = take_point_ret_zero);
@@ -54,4 +56,6 @@ struct SphereMedia: Media {
 	virtual double border(sp<BorderPoint> x) { return x->t > EPS ? 0 : GlobalMedia::instance()->border(x); }
 	virtual bool intersect(Media *another) { return another->intersect(this); }
 	bool intersect(SphereMedia *another) { return norm(another->c - c) < r + another->r; }
+	virtual bool in(Point *x);
+
 };

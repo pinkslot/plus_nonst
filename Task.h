@@ -9,8 +9,8 @@ protected:
 	double size, time_step, min_time, max_time, z_screen,
 		size2, step;
 	string task_name;
-
 	int res, color_mul;
+	bool make_folder();
 public:
 	void go();
 	void point_go();
@@ -37,7 +37,20 @@ public:
 	void init();
 };
 
+class TwoSphere : public Task {
+public:
+	TwoSphere() {}
+	void init();
+};
 
-void Task() {
+class Multiply : public Task {
+public:
+	Multiply() {}
+	void init();
+};
 
-}*/
+class ManySphere : public Task {
+public:
+	ManySphere() {}
+	void init();
+};

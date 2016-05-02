@@ -56,12 +56,19 @@ void print3d(arrayd x) {
 	cout << x[0] << ' ' << x[1] << ' ' << x[2] << endl;
 }
 
-arrayd w1 = make_array3d(-1, 0, -1.), w = w1 / norm(w1);
+arrayd w1 = make_array3d(0, 1., 0), w = w1 / norm(w1);
 double up2w(sp<BorderPoint> x) {
 	return x->t > EPS ? 
-		.3 + exp(-.5 * norm(x->dir - w) * norm(x->dir - w)) :
+		.2 + 15*exp(-6 * norm(x->dir - w) * norm(x->dir - w)) :
 		0;
 }
+
+double up2w_pos_dir(sp<BorderPoint> x) {
+	return x->t > EPS ?
+		.5 + 10.*exp(-2*(norm(x->dir - w) + norm(x->pos / norm(x->pos) + w))) :
+		0;
+}
+
 
 double monus(double x, double y) {
 	return x > y ? x - y : 0;
@@ -82,5 +89,11 @@ double take_point_ret_zero(sp<Point>)
 	return 0.0;
 }
 
+arrayd make_rand_norm_3d() {
+	arrayd ret = { randf() * 2 - 1, randf() * 2 - 1, 0 };
+	ret /= norm(ret);
+	return ret;
+}
+
 stringstream loger;
-int counter = 0;
+

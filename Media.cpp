@@ -1,6 +1,7 @@
 #include "Media.h"
 #include <assert.h>
 
+
 Media::Media(double mu, double mu_s, double k, double(*indic)(), double(*intern)(sp<Point> x)):
 	mu(mu), mu_s(mu_s), k(k), indic(indic), overmedia(0), v(1. / k), intern(intern)
 {
@@ -54,4 +55,10 @@ SphereMedia::SphereMedia(double mu, double mu_s, double k,
 	double r, arrayd c, double(*indic)(), double(*intern)(sp<Point> x)) :
 	Media(mu, mu_s, k, indic, intern), r(r), c(c)
 {
+}
+
+bool SphereMedia::in(Point * x)
+{
+//	double a = norm(x->pos - c);
+	return norm(x->pos - c) <= r + EPS;
 }
