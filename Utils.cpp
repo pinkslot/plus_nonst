@@ -1,8 +1,23 @@
 #include "Utils.h"
 #include "atlimage.h"
+#include "boost/random.hpp"
+#include "boost/generator_iterator.hpp"
 
+typedef boost::mt19937 RNGType;
+RNGType rng;
+boost::uniform_01<> dist;
+
+
+//double randf() {
+//	return (double)rand() / RAND_MAX;
+//}
 double randf() {
-	return ((double)rand() + 1) / (RAND_MAX + 2.);
+	return dist(rng);
+}
+
+void reset_rand() {
+	rng.seed();
+	dist.reset();
 }
 
 arrayd make_array3d(double x, double y, double z) {

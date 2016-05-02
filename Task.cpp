@@ -19,6 +19,7 @@ void Task::go() {
 	int tt = 0;
 	clock_t start = clock();
 	cout << "start on " << task_name << endl;
+	double *img_data = new double[res * res];
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
 		char img_fname[20], log_fname[20];
 		//loger << "QQQQQQQQQQQ" << tt<<endl;
@@ -29,6 +30,7 @@ void Task::go() {
 		for (auto y = res - 1; y >= 0; i += step, y--) {
 			double j = -size2;
 			for (auto x = 0; x < res; j += step, x++) {
+				reset_rand();
 				Point * p = new Point(t, make_array3d(j, i, z_screen), make_array3d(0, 0, 1), G);
 				double f = 0;
 				for (int i = 0; i < k; i++) {
@@ -56,6 +58,7 @@ void Task::point_go() {
 			double ff = p->f(n);
 			f += ff;
 			df += ff * ff;
+		reset_rand();
 		}
 		cout << t << ' ' << f
 			<< " with " << counter / k << " steps" << endl;
