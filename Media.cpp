@@ -14,7 +14,7 @@ arrayd Media::rand_dir() {
 	return make_array3d(cos(phi) * sini, sin(phi) * sini, cosi);
 }
 
-void Media::add_submedia(Media * s) {
+Media *Media::add_submedia(Media *s) {
 	for (auto &i : submedia) {
 		if (i->intersect(s)) {
 //			throw AddSubmediaError();
@@ -22,6 +22,7 @@ void Media::add_submedia(Media * s) {
 	}
 	submedia.push_back(s);
 	s->overmedia = this;
+	return s;
 }
 
 double SphereMedia::ext_dist(Point * x) {

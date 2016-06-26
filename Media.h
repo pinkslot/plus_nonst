@@ -8,7 +8,7 @@ class AddSubmediaError {};
 
 struct GlobalMedia;
 struct SphereMedia;
-class Point;
+struct Point;
 struct Media
 {
 	virtual bool in(Point *x) { return true; }
@@ -16,7 +16,8 @@ struct Media
 	vector<Media *> submedia;
 	Media *overmedia;
 	Media(double mu, double mu_s, double k, double(*indic)(), double(*intern)(sp<Point> x) = take_point_ret_zero);
-	void add_submedia(Media * sub);
+	arrayd rand_dir();
+	Media *Media::add_submedia(Media *s);
 	virtual double ext_dist(Point *x) { cerr << "using pure virtual"; return 0; }
 	virtual double int_dist(Point *x) { cerr << "using pure virtual"; return 0; }
 	virtual arrayd normal(arrayd x) { cerr << "using pure virtual"; return arrayd(0); }

@@ -15,42 +15,40 @@ public:
 	void go();
 	void point_go();
 	void calc_stat();
-	Task();
 };
 
 
 class Task1 : public Task{
 public:
-	Task1() {}
 	void init();
 };
 
 class Task2 : public Task {
 public:
-	Task2() {}
 	void init();
 };
 
 class Task3 : public Task {
 public:
-	Task3() {}
 	void init();
 };
 
 class TwoSphere : public Task {
 public:
-	TwoSphere() {}
 	void init();
 };
 
 class Multiply : public Task {
 public:
-	Multiply() {}
 	void init();
 };
 
 class ManySphere : public Task {
 public:
-	ManySphere() {}
+	void init();
+};
+
+class Refraction : public Task {
+public:
 	void init();
 };

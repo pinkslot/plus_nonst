@@ -2,11 +2,9 @@
 #include <iostream>     // std::cout
 #include <vector>
 #include "Task.h"
-
 int main() {
-	Task2 task = Task2();
+	TwoSphere task;
 	task.init();
-	task.go();
-	
+
 	return 0;
 }

@@ -33,13 +33,6 @@ double norm(arrayd x) {
 	return sqrt(dot(x, x));
 }
 
-double indic_isotrophy() {
-	return randf();
-}
-double indic_direct() {
-	return 1;
-}
-
 double begining(sp<BorderPoint> x) {
 	if (x->t < EPS) {
 		return 1.;
@@ -56,19 +49,20 @@ void print3d(arrayd x) {
 	cout << x[0] << ' ' << x[1] << ' ' << x[2] << endl;
 }
 
-arrayd w1 = make_array3d(0, 1., 0), w = w1 / norm(w1);
+arrayd w1 = make_array3d(1, 0, 0), w = w1 / norm(w1);
 double up2w(sp<BorderPoint> x) {
 	return x->t > EPS ? 
-		.2 + 15*exp(-6 * norm(x->dir - w) * norm(x->dir - w)) :
+		.2 + 20*exp(-10 * norm(x->dir - w) * norm(x->dir - w)) :
 		0;
 }
 
 double up2w_pos_dir(sp<BorderPoint> x) {
 	return x->t > EPS ?
-		.5 + 10.*exp(-2*(norm(x->dir - w) + norm(x->pos / norm(x->pos) + w))) :
+		0.3 + 
+//		exp(-sqr(x->t/20. - 100.)) *
+		25. * exp(-5 * (norm(x->dir + w) + norm(x->pos / norm(x->pos) - w))) :
 		0;
 }
-
 
 double monus(double x, double y) {
 	return x > y ? x - y : 0;
@@ -80,8 +74,8 @@ double around_c(sp<BorderPoint> x) {
 	return x->t > -1 ? monus(r, dif) / r * 5. : 0;
 }
 
-int no_more255(int value) {
-	return value > 255 ? 255 : value;
+int no_more255(double value) {
+	return value > 255. ? 255 : int(value);
 }
 
 double take_point_ret_zero(sp<Point>)
