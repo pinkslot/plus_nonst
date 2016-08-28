@@ -39,6 +39,7 @@ double exp_rand(double l, double maxv) {
 	return log((exp(-l * maxv) - 1) * randf() + 1) / -l;
 }
 
+#define NONBRANCH
 double Point::f(int n) {
 	//loger << "f";
 	double min_dist = media->int_dist(this);
@@ -59,32 +60,49 @@ double Point::f(int n) {
 	}
 	arrayd border_pos = pos - dir * min_dist;
 	double optical_dist = exp(-media->mu * min_dist);
+
 	sp<BorderPoint> border_point(new BorderPoint(border_t, border_pos, dir, nearest, media));
+#ifdef NONBRANCH
+	double coin = randf();
+#endif // NONBRANCH
+
 	if (!n) {
+#ifdef NONBRANCH
+		return coin < optical_dist ? nearest->border(border_point) : 0;
+#endif // NONBRANCH
 		return optical_dist * nearest->border(border_point);
 	}
+
+#ifdef NONBRANCH
+	if (coin < optical_dist) {
+		return nearest->border(border_point) + border_point->f(n - 1);
+	}
+#endif // NONBRANCH
 	double scat = 0;
 	int m = GlobalMedia::instance()->m;
 	if (m && min_dist > EPS) {
 		arrayd Q = rorate2array_matrix(dir);
-		for (int i = 0; i < m; i++) {
-			arrayd new_dir = Matmul(Q, media->rand_dir());
-			double rand_dist = exp_rand(media->mu, min_dist - EPS);
-			arrayd new_pos = pos - dir * rand_dist;
-			sp<Point> p(new Point(t - rand_dist / media->v, new_pos, new_dir, media));
-			scat += p->f(n - 1) * media->mu_s + media->intern(p);
-		}
-		scat *= (1 - optical_dist) / media->mu / m;
+		arrayd new_dir = Matmul(Q, media->rand_dir());
+		double rand_dist = exp_rand(media->mu, min_dist - EPS);
+		arrayd new_pos = pos - dir * rand_dist;
+		sp<Point> p(new Point(t - rand_dist / media->v, new_pos, new_dir, media));
+		scat = media->mu / m * (p->f(n - 1) * media->mu_s + media->intern(p));
 	}
-	return (nearest->border(border_point) + border_point->f(n - 1)) * optical_dist + scat;
+#ifdef NONBRANCH
+	return scat;
+#endif // NONBRANCH
+	return optical_dist * (nearest->border(border_point) + border_point->f(n - 1)) + (1 - optical_dist) * scat;
 }
 
 BorderPoint::BorderPoint(double t, arrayd pos, arrayd dir, Media *media_from, Media *media_to):
 	Point(t, pos, dir, media_from), media_to(media_to) {
 }
-
+int counter = 0;
+double avg_n = 0;
 double BorderPoint::f(int n) {
 	if (t < EPS || media->is_global()) {
+		//avg_n = avg_n * counter / (counter + 1) + (20. - n) / (counter + 1);
+		//counter++;
 		return 0;
 	}
 	arrayd normal;
@@ -99,10 +117,9 @@ double BorderPoint::f(int n) {
 
 	arrayd dirR = dir - 2 * cosAfter * normal;
 	//loger << "R " <<   n <<endl;
-	double partR = Point(t, pos, dirR, media_to).f(n);
 	double cosT = 1 - k * k * (1 - cosAfter * cosAfter);
 	if (cosT < 0) {
-		return partR;
+		return Point(t, pos, dirR, media_to).f(n);
 	}
 	cosT = sqrt(cosT);
 	arrayd dirT = cosT * normal + k * (dir - cosAfter * normal);
@@ -117,8 +134,13 @@ double BorderPoint::f(int n) {
 		R = 1. / 2. * (Rpar * Rpar + Rper * Rper),
 		T = 1. / 2. * (Tpar * Tpar + Tper * Tper) * k * cosAfter / cosT;
 		double q = dot(dirT, normal), w = dot(dirR, normal);
-	// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
-		return R * partR + T * Point(t, pos, dirT, media).f(n);
+		// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
+#ifdef NONBRANCH
+		return randf() < R / (R + T) ?
+			Point(t, pos, dirR, media_to).f(n) :
+			Point(t, pos, dirT, media).f(n);
+#endif // NONBRANCH
+		return R * Point(t, pos, dirR, media_to).f(n) + T * Point(t, pos, dirT, media).f(n);
 }
 
 Point::~Point()

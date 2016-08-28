@@ -18,4 +18,6 @@ struct BorderPoint: Point {
 	double f(int n);
 };
 
+extern double avg_n;
+extern int counter;
 #include "Media.h"
