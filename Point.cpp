@@ -39,7 +39,7 @@ double exp_rand(double l, double maxv) {
 	return log((exp(-l * maxv) - 1) * randf() + 1) / -l;
 }
 
-#define NONBRANCH
+#define NONBRANCH 5
 double Point::f(int n) {
 	//loger << "f";
 	double min_dist = media->int_dist(this);
@@ -63,18 +63,16 @@ double Point::f(int n) {
 
 	sp<BorderPoint> border_point(new BorderPoint(border_t, border_pos, dir, nearest, media));
 #ifdef NONBRANCH
-	double coin = randf();
-#endif // NONBRANCH
-
-	if (!n) {
-#ifdef NONBRANCH
-		return coin < optical_dist ? nearest->border(border_point) : 0;
+	if (n == -10) {
+#else
+	if (n == 0) {
 #endif // NONBRANCH
 		return optical_dist * nearest->border(border_point);
 	}
 
 #ifdef NONBRANCH
-	if (coin < optical_dist) {
+	double coin;
+	if ((n <= NONBRANCH) && (coin = randf()) < optical_dist) {
 		return nearest->border(border_point) + border_point->f(n - 1);
 	}
 #endif // NONBRANCH
@@ -90,7 +88,12 @@ double Point::f(int n) {
 		scat = 1. / media->mu / m * (p->f(n - 1) * media->mu_s + media->intern(p));
 	}
 #ifdef NONBRANCH
-	return scat;
+	if (n > NONBRANCH) {
+		return optical_dist * (nearest->border(border_point) + border_point->f(n - 1)) + (1 - optical_dist) * scat;
+	}
+	else {
+		return scat;
+	}
 #endif // NONBRANCH
 	return optical_dist * (nearest->border(border_point) + border_point->f(n - 1)) + (1 - optical_dist) * scat;
 }
@@ -137,6 +140,7 @@ double BorderPoint::f(int n) {
 		double q = dot(dirT, normal), w = dot(dirR, normal);
 		// cout << "T: " << T << " R: " << R << ' ' << partR <<  endl;
 #ifdef NONBRANCH
+		if (n <= NONBRANCH)
 		return randf() < R / (R + T) ?
 			Point(t, pos, dirR, media_to).f(n) :
 			Point(t, pos, dirT, media).f(n);
