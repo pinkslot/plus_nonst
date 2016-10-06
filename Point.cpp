@@ -86,7 +86,8 @@ double Point::f(int n) {
 		double rand_dist = exp_rand(media->mu, min_dist - EPS);
 		arrayd new_pos = pos - dir * rand_dist;
 		sp<Point> p(new Point(t - rand_dist / media->v, new_pos, new_dir, media));
-		scat = media->mu / m * (p->f(n - 1) * media->mu_s + media->intern(p));
+
+		scat = 1. / media->mu / m * (p->f(n - 1) * media->mu_s + media->intern(p));
 	}
 #ifdef NONBRANCH
 	return scat;
