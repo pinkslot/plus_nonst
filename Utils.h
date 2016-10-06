@@ -1,5 +1,4 @@
 #pragma once
-
 #include <cstdlib>
 #define _USE_MATH_DEFINES
 #include <math.h>

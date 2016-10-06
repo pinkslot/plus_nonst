@@ -3,15 +3,15 @@
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
 
-typedef boost::mt19937 RNGType;
-RNGType rng;
-boost::uniform_01<> dist;
 
+boost::mt19937 rng;
+boost::uniform_01<> dist;
 
 //double randf() {
 //	return (double)rand() / RAND_MAX;
 //}
 double randf() {
+	//return static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 	return dist(rng);
 }
 
