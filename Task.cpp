@@ -25,28 +25,29 @@ void Task::go() {
 	cout << "start on " << task_name << endl;
 	double *img_data = new double[res * res * 2];
 
-	Screen sc(res, size, { 0, 15, z_screen }, {0, 15, z_screen}, G);
+	Screen sc(res, size, { 0, 0, z_screen }, { 0, 0, z_screen}, G);
 	int tt = 0;
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
-		const int kk_per_frame = k;
-		for (int kk = 0; kk < k; kk += kk_per_frame) {
+
+		for (int old_kk = 0, kk = 5; kk < k; old_kk = kk, kk *= 2) {
 			int i = 0;
 			while(sc.next(t)) {
 				double &f = img_data[i++], &ff = img_data[i++];
 				//if (!(kk &&(f < EPS || sigma(f, ff, kk) / sqrt(kk) < .05))) {
-					for (int pixkk = kk; pixkk < kk + kk_per_frame; pixkk++) {
-						if (pixkk > 10 && f < 1e-5)
-							break;
-						double res_f = sc.cur->f(n);
-						f = double(pixkk) / (pixkk + 1) * f + res_f / (pixkk + 1);
-						//ff = double(pixkk) / (pixkk + 1) * ff + sqr(res_f) / (pixkk + 1);
-						/*if (f != f) {
-							f = 0;
-							throw NanResult();
-						}*/
-					}
-				//}
+				for (int pixkk = old_kk; pixkk < kk; pixkk++) {
+					if (pixkk > 1e4 && f < 1e-5)
+						break;
+					double res_f = sc.cur->f(n);
+					f = double(pixkk) / (pixkk + 1) * f + res_f / (pixkk + 1);
+					//ff = double(pixkk) / (pixkk + 1) * ff + sqr(res_f) / (pixkk + 1);
+					/*if (f != f) {
+						f = 0;
+						throw NanResult();
+					}*/
+				}
+
 			}
+		//}
 			
 			i = 0;
 			//int skip_count = 0;
@@ -55,6 +56,9 @@ void Task::go() {
 					double &f = img_data[i++], &ff = img_data[i++];
 					int val = no_more255(f * color_mul);
 					img.SetPixel(x, y, RGB(val, val, val));
+					if (x == res / 2 && y == res / 2) {
+						img.SetPixel(x, y, RGB(255, 0, 0));
+					}
 					/*
 					opt_image.SetPixel(x, y, RGB(val, val, val));
 					if (!(kk && (f < EPS || sigma(f, ff, kk) / sqrt(kk) < .05))) {
@@ -64,9 +68,18 @@ void Task::go() {
 					*/
 				}
 			}
-			char img_fname[30], opt_img_name[30];
-			sprintf_s(img_fname, "%s/%02i_%02i.bmp", task_name.c_str(), tt, kk);
+			char img_fname[30], log_fname[30];
+			cout << endl << endl;
+			//sprintf_s(img_fname, "%s/%02i_%04i.bmp", task_name.c_str(), tt, kk);
+			//sprintf_s(log_fname, "%s/%02i_%02i.log", task_name.c_str(), tt, kk);
+
+			sprintf_s(img_fname, "%s/%04i.bmp", task_name.c_str(), kk);
+			sprintf_s(log_fname, "%s/%04i.log", task_name.c_str(), kk);
+			ofstream out(log_fname);
+
 			img.Save(img_fname);
+			out << '\xd' << "t = "<< tt << ")DONE " << t << " k = " << kk << " \tin " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
+
 			/*
 			opt_image.Save(opt_img_name);
 			sprintf_s(opt_img_name, "%s/%02i_%02i_opt.bmp", task_name.c_str(), tt, kk);
@@ -86,35 +99,41 @@ void Task::point_go() {
 	clock_t start = clock();
 	cout << "start on " << task_name << endl;
 
-	Screen sc(res, size, { 0, 15, z_screen }, { 0, 15, z_screen }, G);
+	//for (int n = 8; n < 9; n += 5) 
+	{
+	char log_fname[20];
+	sprintf_s(log_fname, "%s/%02i.log", task_name.c_str(), n);
+	ofstream out(log_fname);
 	for (double t = min_time; t < max_time; t += time_step, tt++) {
-		vector<Point> ps = { Point(t, make_array3d(0, 10., z_screen), make_array3d(0, 0, 1.), G),
-		Point(t, make_array3d(0, -10., z_screen), make_array3d(0, 0, 1.), G) };
-		char log_fname[20];
-		sprintf_s(log_fname, "%s/%02i.log", task_name.c_str(), tt);
-		ofstream out(log_fname);
-		for (int n = 18; n < 21; n += 2) {
+		vector<Point> ps = { Point(t, make_array3d(0, 0, z_screen), make_array3d(0, 0, 1.), G),
+			//Point(t, make_array3d(0, -10., z_screen), make_array3d(0, 0, 1.), G) 
+		};
 			for (auto p : ps) {
 				clock_t start = clock();
 				double ff = 0;
 				double f = 0;
-				const int count = 100;
-				for (int l = 0; l < count; l++) {
+				for (int l = 0; l < k; l++) {
 					double val = p.f(n);
 					f = double(l) / (l + 1) * f + val / (l + 1);
 					ff = double(l) / (l + 1) * ff + val * val / (l + 1);
-					//cout << "\r    \r" << l;
-					cout << '.';
+					if (l % 1000 == 0) cout << "\r    \r" << l / 1000;
 				}
-				out << scientific;
-				ff = sigma(f, ff, count);
-				out << ":nn = " << n << "\tf = " << f << "\tdf = " << ff <<
-					"\trel_df = " << ff / f << "\tt = " << (clock() - start) / (double)CLOCKS_PER_SEC / count << endl;
-				cout << endl;
+				out << scientific;	
+				cout << scientific;
+				ff = sigma(f, ff, k);
+				double time_per_val = (clock() - start) / (double)CLOCKS_PER_SEC / k;
+				out << "t = " << t << " nn = " << n << "\tf = " << f << "\tdf = " << ff <<
+					"\trel_df = " << ff / f << "\tcalc_t = " << time_per_val <<
+					"\tcompl: " << ff * time_per_val << endl;
+				cout << "t = " << t << " nn = " << n << "\tf = " << f << "\tdf = " << ff <<
+					"\trel_df = " << ff / f << "\tcalc_t = " << time_per_val  <<
+					"\tcompl: " << ff * time_per_val << endl;
 			}
-		}
 		cout << '\xd' << tt << ")DONE " << t << " \tin " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
+		cout << "avg_n: " << avg_n << endl;
+		counter = 0, avg_n = 0;
 	}
+		}
 }
 
 double ans(double t) {
@@ -132,34 +151,6 @@ void print_to_streams(vector<double> v) {
 	cout << endl; log_out << endl;
 }
 
-void Task::calc_stat() {
-	cout << "start on " << task_name << endl;
-	char log_fname[20];
-	sprintf_s(log_fname, "%s.log", task_name.c_str());
-	log_out = ofstream(log_fname);
-	(cout << std::scientific).precision(3);
-	(log_out << std::scientific).precision(3);
-	string header("n\t f\t\t eps\t\t delf\t\t r_delf\t\t complex\n");
-	cout << header;
-	log_out << header;
-
-	double TIME = 10;
-	for (int n = 2; n < 100; n++) {
-		Point * p = new Point(TIME, make_array3d(1., 0., z_screen), make_array3d(0, 0, 1), G);
-		clock_t start = clock();
-		double Ef = 0, Ef2 = 0;
-		for (int i = 0; i < k; i++) {
-			double f = p->f(n);
-			Ef = double(i) / (i + 1) * Ef + f / (i + 1);
-			Ef2 = double(i) / (i + 1) * Ef2 + f * f / (i + 1);
-			if (i % 1000 == 0) cout << "\r         " << '\xd' << i / 1000 << '/' << k / 1000;
-		}
-		double avg_time = (clock() - start) / (double)CLOCKS_PER_SEC / k;
-		double Df = double(k) / (k - 1) *(Ef2 - Ef * Ef);
-		cout << "\r         " << '\xd' << n << '\t'; log_out << n << '\t';
-		print_to_streams({Ef, Ef / ans(TIME) - 1, Df , Df / Ef, Df * avg_time});
-	}
-}
 /*
 void Task1::init() {
 	// ADD BEGINING COND
@@ -179,58 +170,73 @@ void Task1::init() {
 	go();
 }
 
-void Task2::init() {
-	G = new SphereMedia(.1, .1, 1., 10., make_array3d(0, 0, 0), Indic_Direct);
-	GlobalMedia::instance(up2w_pos_dir, 1)->add_submedia(G);
-	G->add_submedia(new SphereMedia(.4, .4, 1.1, 5, make_array3d(0, 0, 0), Indic_isotrophy));
-	G->add_submedia(new SphereMedia(.1, .1, 10., 1., make_array3d(-7, 0, 0), Indic_isotrophy));
-	G->add_submedia(new SphereMedia(.1, .1, 10., 1, make_array3d(5, -5, 0), Indic_isotrophy));
 
-	res = 500, color_mul = 200;
-
-	n = 5, k = 100;
-	size = 20, time_step = 3, min_time = 10, max_time = 40, z_screen = 6,
-		size2 = size / 2, step = size / res;
-	task_name = "sec";
-	go();
-}
 */
-arrayd ww = {1, 0, 0};
+arrayd ww1 = {0,0, -1 }, ww = normalize(ww1);
+
 double border(sp<BorderPoint> x) {
 	return x->t > EPS ?
-		//		exp(-sqr(x->t/20. - 100.)) *
-		3 * exp(-(norm(x->dir + ww) + norm(x->pos / norm(x->pos) - ww))) :
+		exp(-2 * (norm(x->dir + ww) + norm(normalize(x->pos) - ww)) + 4):
 		0;
 }
 
-void Task3::init() {
-	auto ind = indic_henyey<2>;
-	G = new SphereMedia(.001, .001, 3., 100., make_array3d(0, 0, 0), ind);
+void Task2::init() {
+	G = new SphereMedia(1e-6, 1e-6, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
 	GlobalMedia::instance(border)->add_submedia(G);
-	G->add_submedia(new SphereMedia(1, 1, 3., 11, make_array3d(0, 15, 0), indic_isotrophy));
-	G->add_submedia(new SphereMedia(3, 6, 3., 11, make_array3d(0, -15, 0), indic_isotrophy));
-
-	res = 100, color_mul = 170;
-	n = 7, k = 10;
-	size = 50., time_step = 50, min_time = 2360, max_time = 3000, z_screen = 50,
+	G->add_submedia(new SphereMedia(1e-6, 1e-6, 1.5, 0.1, make_array3d(0, 0, 0), indic_isotrophy))
+		->add_submedia(new SphereMedia(1e-6, 1e-6, .1, 0.04, make_array3d(0, 0, 0), indic_isotrophy));
+	G->add_submedia(new SphereMedia(1e-6, 1e-6, .1, 0.04, make_array3d(0.2, 0, 0), indic_isotrophy));
+	res = 200, color_mul = 200;
+	n = 20, k = 1e3;
+	size = .5, time_step = 2, min_time = 10, max_time = 11, z_screen = .7,
 		size2 = size / 2, step = size / res;
-	task_name = "trd5";
+	task_name = "qweqwe";
+	go();
+}
+arrayd ee1 = { 0,0, -1 }, ee = normalize(ee1);
+double border1(sp<BorderPoint> x) {
+	return 2 - norm(x->pos - ee);
+}
+void Task3::init() {
+
+	G = new SphereMedia(6, 6, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
+	GlobalMedia::instance(border1)->add_submedia(G);
+	G->add_submedia(new SphereMedia(6, 6, 2, 100, make_array3d(0, 0, -100), indic_isotrophy));
+
+	res = 100, color_mul = 255/2;
+	n = -9, k = int(1e4);
+	size = 1.5, time_step = 5, min_time = 100, max_time = 101, z_screen = 0.6,
+		size2 = size / 2, step = size / res;
+	task_name = "simple";
 	point_go();
 }
 
-void TwoSphere::init() {
-	auto ind = indic_henyey<4, 3>;
-	G = new SphereMedia(.0001, .0001, 3., 100., make_array3d(0, 0, 0), ind);
-	GlobalMedia::instance(border)->add_submedia(G);
-	G->add_submedia(new SphereMedia(.5, .5, 3., 13, make_array3d(0, 0, 0), indic_isotrophy));
-	G->add_submedia(new SphereMedia(.3, .3, 30., 4, make_array3d(15, 0, -15), indic_isotrophy));
-	G->add_submedia(new SphereMedia(.3, .3, 30., 4, make_array3d(-15, 0, 15), indic_isotrophy));
+arrayd qq1 = { 0 , 1, 0 }, qq = normalize(qq1);
+double border2(sp<BorderPoint> x) {
+	return x->t > EPS ?
+		exp(-4 * (norm(x->dir + qq) /*+  norm(normalize(x->pos) - qq)*/) + 4) :
+		//		exp(-sqr(x->t/20. - 100.)) *
+		0;
+}	
 
-	res = 300, color_mul = 200;
-	n = 7, k = 20;
-	size = 50., time_step = 20, min_time = 430, max_time = 3000, z_screen = 50,
+void TwoSphere::init() {
+//	auto ind = indic_henyey<4, 3>;
+	G = new SphereMedia(1e-6, 1e-6, 3., 100., make_array3d(0, 0, 0), indic_isotrophy);
+	GlobalMedia::instance(border2)->add_submedia(G);
+	
+	//G->add_submedia(new SphereMedia(1, 1, 300., 1000., make_array3d(0, -1000 - 14., 0), indic_isotrophy));
+	G->add_submedia(new SphereMedia(3e-2, 1e-2, 4, 15, make_array3d(0, 0, 0), indic_isotrophy))
+		->add_submedia(new SphereMedia(.2, .1, .01, 5, make_array3d(0, 2, -2), indic_isotrophy));
+	//G->add_submedia(new SphereMedia(.2, .1, 4, 20, make_array3d(0, 0, 0), indic_isotrophy));
+	/*G->add_submedia(new SphereMedia(1, 1, 300., 4, make_array3d(15, 0, 15), indic_isotrophy));
+	G->add_submedia(new SphereMedia(1, 1, 300., 4, make_array3d(-15, 0, -15), indic_isotrophy));
+	G->add_submedia(new SphereMedia(1, 1, 300., 4, make_array3d(7.5, 17, 0), indic_isotrophy));
+	*/
+	res = 200, color_mul = 170;
+	n = 7, k = int(1e4);
+	size = 50., time_step = 10, min_time = 3500, max_time = 3501, z_screen = 50,
 		size2 = size / 2, step = size / res;
-	task_name = "two_sphere";
+	task_name = "qweqwe";
 	go();
 }
 
@@ -301,9 +307,9 @@ void Refraction::init(){
 		add_submedia(new SphereMedia(.01, .01, 30., 5, make_array3d(-13, 1, 0), ind));
 
 	res = 200, color_mul = 170;
-	n = 7, k = 5;
+	n = 7, k = 500;
 	size = 50., time_step = 5, min_time = 2400, max_time = 3000, z_screen = 50,
 		size2 = size / 2, step = size / res;
-	task_name = "Refraction";
+	task_name = "R1";
 	go();
 }

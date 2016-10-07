@@ -11,10 +11,12 @@ protected:
 	string task_name;
 	int res, color_mul;
 	bool make_folder();
+	double lambda;		// remove it
 public:
 	void go();
 	void point_go();
 	void calc_stat();
+	Task() : lambda(0) {}
 };
 
 
