@@ -3,8 +3,7 @@
 #include <vector>
 #include "Task.h"
 int main() {
-	TwoSphere task;
+	Task3 task;
 	task.init();
-
 	return 0;
 }

@@ -116,18 +116,18 @@ void Task::point_go() {
 					double val = p.f(n);
 					f = double(l) / (l + 1) * f + val / (l + 1);
 					ff = double(l) / (l + 1) * ff + val * val / (l + 1);
-					if (l % 1000 == 0) cout << "\r    \r" << l / 1000;
+					if (l % 10000 == 0) cout << "\r    \r" << l / 10000;
 				}
 				out << scientific;	
 				cout << scientific;
 				ff = sigma(f, ff, k);
 				double time_per_val = (clock() - start) / (double)CLOCKS_PER_SEC / k;
-				out << "t = " << t << " nn = " << n << "\tf = " << f << "\tdf = " << ff <<
-					"\trel_df = " << ff / f << "\tcalc_t = " << time_per_val <<
-					"\tcompl: " << ff * time_per_val << endl;
-				cout << "t = " << t << " nn = " << n << "\tf = " << f << "\tdf = " << ff <<
-					"\trel_df = " << ff / f << "\tcalc_t = " << time_per_val  <<
-					"\tcompl: " << ff * time_per_val << endl;
+				out << "t = " << t << " nn = " << n << "\tf = " << f << "\tsf = " << ff <<
+					"\tdf = " << ff * ff << "\tcalc_t = " << time_per_val <<
+					"\tcompl: " << ff * ff * time_per_val << endl;
+				cout << "t = " << t << " nn = " << n << "\tf = " << f << "\tsf = " << ff <<
+					"\tdf = " << ff * ff << "\tcalc_t = " << time_per_val  <<
+					"\tcompl: " << ff * ff * time_per_val << endl;
 			}
 		cout << '\xd' << tt << ")DONE " << t << " \tin " << (clock() - start) / (double)CLOCKS_PER_SEC << endl;
 		cout << "avg_n: " << avg_n << endl;
@@ -180,31 +180,36 @@ double border(sp<BorderPoint> x) {
 		0;
 }
 
-void Task2::init() {
-	G = new SphereMedia(1e-6, 1e-6, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
-	GlobalMedia::instance(border)->add_submedia(G);
-	G->add_submedia(new SphereMedia(1e-6, 1e-6, 1.5, 0.1, make_array3d(0, 0, 0), indic_isotrophy))
-		->add_submedia(new SphereMedia(1e-6, 1e-6, .1, 0.04, make_array3d(0, 0, 0), indic_isotrophy));
-	G->add_submedia(new SphereMedia(1e-6, 1e-6, .1, 0.04, make_array3d(0.2, 0, 0), indic_isotrophy));
-	res = 200, color_mul = 200;
-	n = 20, k = 1e3;
-	size = .5, time_step = 2, min_time = 10, max_time = 11, z_screen = .7,
-		size2 = size / 2, step = size / res;
-	task_name = "qweqwe";
-	go();
+double uni_border(sp<BorderPoint> x) {
+	return 10.;
 }
+
+void Task2::init() {
+	const int mu = 10;
+	G = new SphereMedia(mu, mu, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
+	GlobalMedia::instance(uni_border, 1000)->add_submedia(G);
+
+	res = 100, color_mul = 255;
+	n = -9, k = int(1e4);
+	size = 1.5, time_step = 5, min_time = 100, max_time = 101, z_screen = 0.6,
+		size2 = size / 2, step = size / res;
+	task_name = "uniform";
+	point_go();
+}
+
 arrayd ee1 = { 0,0, -1 }, ee = normalize(ee1);
 double border1(sp<BorderPoint> x) {
 	return 2 - norm(x->pos - ee);
 }
-void Task3::init() {
 
-	G = new SphereMedia(6, 6, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
+void Task3::init() {
+	const int mu = 5;
+	G = new SphereMedia(mu, mu, 1, 1., make_array3d(0, 0, 0), indic_isotrophy);
 	GlobalMedia::instance(border1)->add_submedia(G);
-	G->add_submedia(new SphereMedia(6, 6, 2, 100, make_array3d(0, 0, -100), indic_isotrophy));
+	G->add_submedia(new SphereMedia(mu, mu, 2, 100, make_array3d(0, 0, -100), indic_isotrophy));
 
 	res = 100, color_mul = 255/2;
-	n = -9, k = int(1e4);
+	n = -9, k = int(1e5);
 	size = 1.5, time_step = 5, min_time = 100, max_time = 101, z_screen = 0.6,
 		size2 = size / 2, step = size / res;
 	task_name = "simple";
